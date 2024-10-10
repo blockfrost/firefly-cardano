@@ -221,6 +221,7 @@ impl ChainSyncClient for N2cChainSync {
             block_height,
             block_slot,
             parent_hash: block.previous_block,
+            cbor: vec![],
             transaction_hashes,
         };
 
@@ -271,6 +272,7 @@ impl N2cChainSync {
             block_slot: Some(block_slot),
             block_hash,
             parent_hash,
+            cbor: content.0,
             transaction_hashes,
         })
     }
