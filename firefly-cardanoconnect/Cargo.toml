@@ -9,7 +9,7 @@ aide = { version = "0.13", features = ["axum"] }
 anyhow = "1"
 async-trait = "0.1"
 axum = { version = "0.7", features = ["macros", "ws"] }
-balius-runtime = { git = "https://github.com/SupernaviX/balius.git", rev = "5f0c81a" }
+balius-runtime = { git = "https://github.com/txpipe/balius.git", rev = "09672d5" }
 blockfrost = { version = "1", default-features = false, features = ["rustls-tls"] }
 clap = { version = "4", features = ["derive"] }
 chrono = "0.4"
