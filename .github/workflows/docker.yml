@@ -3,84 +3,105 @@ name: Publish Docker image
 on:
   push:
     branches:
-      - main
+      - docker-stuff
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
+# push_to_registry:
+#   name: Push Docker image to GHCR
+#   runs-on: ubuntu-latest
+#   permissions:
+#     packages: write
+#     contents: read
+#     attestations: write
+#     id-token: write
+#   steps:
+#     - name: Check out the repo
+#       uses: actions/checkout@v4
+
+#     - name: Set up Docker Buildx
+#       uses: docker/setup-buildx-action@v3.8.0
+
+#     - name: Log in to GHCR
+#       uses: docker/login-action@v3.3.0
+#       with:
+#         registry: ghcr.io
+#         username: ${{ github.actor }}
+#         password: ${{ secrets.GITHUB_TOKEN }}
+
+#     - name: Cargo Cache
+#       id: cache
+#       uses: actions/cache@v4
+#       with:
+#         path: |
+#           cargo-registry-cache
+#           sccache-cache
+#         key: ${{ runner.os }}-cargo-cache-${{ github.sha }}
+#         restore-keys: |
+#           ${{ runner.os }}-cargo-cache
+
+#     - name: inject cargo caches into docker
+#       uses: reproducible-containers/buildkit-cache-dance@v3.1.2
+#       with:
+#         cache-map: |
+#           {
+#             "cargo-registry-cache": "/usr/local/cargo/registry",
+#             "sccache-cache": "/sccache"
+#           }
+#         skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
+#     - name: Extract Docker metadata for firefly-cardanoconnect
+#       id: firefly-cardanoconnect-meta
+#       uses: docker/metadata-action@v5.6.1
+#       with:
+#         images: ghcr.io/blockfrost/firefly-cardanoconnect
+#     - name: Build and push Docker image for firefly-cardanoconnect
+#       id: firefly-cardanoconnect-push
+#       uses: docker/build-push-action@v6.10.0
+#       with:
+#         cache-from: type=gha
+#         cache-to: type=gha,mode=max
+#         context: .
+#         file: ./Dockerfile
+#         target: firefly-cardanoconnect
+#         push: true
+#         tags: ${{ steps.firefly-cardanoconnect-meta.outputs.tags }}
+#         labels: ${{ steps.firefly-cardanoconnect-meta.outputs.labels }}
+
+#     - name: Extract Docker metadata for firefly-cardanosigner
+#       id: firefly-cardanosigner-meta
+#       uses: docker/metadata-action@v5.6.1
+#       with:
+#         images: ghcr.io/blockfrost/firefly-cardanosigner
+#     - name: Build and push Docker image for firefly-cardanosigner
+#       id: firefly-cardanosigner-push
+#       uses: docker/build-push-action@v6.10.0
+#       with:
+#         registry: ghcr.io
+#         cache-from: type=gha
+#         cache-to: type=gha,mode=max
+#         context: .
+#         file: ./Dockerfile
+#         target: firefly-cardanosigner
+#         push: true
+#         tags: ${{ steps.firefly-cardanosigner-meta.outputs.tags }}
+#         labels: ${{ steps.firefly-cardanosigner-meta.outputs.labels }}
+
+  demo:
+    name: Run Demo
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
+    #    needs: push_to_registry
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
-
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@5138f76647652447004da686b2411557eaf65f33
-          
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      - name: Start docker-compose
+        run: docker compose -f ./infra/docker-compose.yaml -p preview up  -d --no-build
+      - name: Add just
+        uses: extractions/setup-just@v2
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Cargo Cache
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            cargo-registry-cache
-            sccache-cache
-          key: ${{ runner.os }}-cargo-cache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-cache
-
-      - name: inject cargo caches into docker
-        uses: reproducible-containers/buildkit-cache-dance@5b6db76d1da5c8b307d5d2e0706d266521b710de # v3.1.2
-        with:
-          cache-map: |
-            {
-              "cargo-registry-cache": "/usr/local/cargo/registry",
-              "sccache-cache": "/sccache"
-            }
-          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
-
-      - name: Extract Docker metadata for firefly-cardanoconnect
-        id: firefly-cardanoconnect-meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: sundaeswap/firefly-cardanoconnect
-      - name: Build and push Docker image for firefly-cardanoconnect
-        id: firefly-cardanoconnect-push
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          context: .
-          file: ./Dockerfile
-          target: firefly-cardanoconnect
-          push: true
-          tags: ${{ steps.firefly-cardanoconnect-meta.outputs.tags }}
-          labels: ${{ steps.firefly-cardanoconnect-meta.outputs.labels }}
-
-      - name: Extract Docker metadata for firefly-cardanosigner
-        id: firefly-cardanosigner-meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: sundaeswap/firefly-cardanosigner
-      - name: Build and push Docker image for firefly-cardanosigner
-        id: firefly-cardanosigner-push
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          context: .
-          file: ./Dockerfile
-          target: firefly-cardanosigner
-          push: true
-          tags: ${{ steps.firefly-cardanosigner-meta.outputs.tags }}
-          labels: ${{ steps.firefly-cardanosigner-meta.outputs.labels }}
+          toolchain: stable
+      - name: Add wasm32-unknown-unknown target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Run demo
+        run: just demo
