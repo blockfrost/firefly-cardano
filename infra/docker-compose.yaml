@@ -1,5 +1,6 @@
 services:
   firefly-cardanoconnect:
+    image: ghcr.io/blockfrost/firefly-cardanoconnect:docker-stuff
     build:
       context: ..
       target: firefly-cardanoconnect
@@ -19,6 +20,7 @@ services:
       - ./connect.yaml:/app/config.yaml
 
   firefly-cardanosigner:
+    image: ghcr.io/blockfrost/firefly-cardanosigner:docker-stuff
     build:
       context: ..
       target: firefly-cardanosigner
@@ -26,7 +28,9 @@ services:
       watch:
       - action: rebuild
         path: ../firefly-cardanosigner
-    command: ./firefly-cardanosigner --config-file ./config.yaml
+    command: ./firefly-cardanosigner
+    environment:
+      - FIREFLY_SIGNER_FILEWALLET_PATH=/wallet
     ports:
       - 8555:8555
     volumes:
