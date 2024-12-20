@@ -97,6 +97,8 @@ jobs:
         run: mkdir ./infra/wallet ; echo "${{ secrets.DEMO_WALLET }}" > ./infra/wallet/addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4.skey
       - name: Start docker-compose
         run: docker compose -f ./infra/docker-compose.yaml -p preview up  -d --no-build
+        env:
+          BLOCKFROST_KEY: ${{ secrets.BLOCKFROST_KEY }}
       - name: Add just
         uses: extractions/setup-just@v2
       - name: Set up Rust
@@ -109,5 +111,4 @@ jobs:
         env:
           ADDR_FROM: addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4
           ADDR_TO: addr_test1vqeux7xwusdju9dvsj8h7mca9aup2k439kfmwy773xxc2hcu7zy99
-          BLOCKFROST_KEY: ${{ secrets.BLOCKFROST_KEY }}
         run: just demo
