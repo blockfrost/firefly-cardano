@@ -93,6 +93,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+      - name: Add wallet secret
+        run: mkdir ./infra/wallet ; echo "${{ secrets.DEMO_WALLET }}" > ./infra/wallet/addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4.skey
       - name: Start docker-compose
         run: docker compose -f ./infra/docker-compose.yaml -p preview up  -d --no-build
       - name: Add just
@@ -103,8 +105,6 @@ jobs:
           toolchain: stable
       - name: Add wasm32-unknown-unknown target
         run: rustup target add wasm32-unknown-unknown
-      - name: Add wallet secret
-        run: mkdir ./infra/wallet ; echo "${{ secrets.DEMO_WALLET }}" > ./infra/wallet/addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4.skey
       - name: Run demo
         env:
           ADDR_FROM: addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4
