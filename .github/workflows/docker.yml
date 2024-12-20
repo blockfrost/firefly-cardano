@@ -104,7 +104,7 @@ jobs:
       - name: Add wasm32-unknown-unknown target
         run: rustup target add wasm32-unknown-unknown
       - name: Add wallet secret
-        run: echo "${{ secrets.DEMO_WALLET }}" > ./infra/wallet/addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4.skey
+        run: mkdir ./infra/wallet ; echo "${{ secrets.DEMO_WALLET }}" > ./infra/wallet/addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4.skey
       - name: Run demo
         env:
           ADDR_FROM: addr_test1vqhkukz0285zvk0xrwk9jlq0075tx6furuzcjvzpnhtgelsuhhqc4
