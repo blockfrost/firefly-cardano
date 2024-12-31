@@ -62,7 +62,6 @@ fn send_ada(_: Config<()>, req: Params<TransferRequest>) -> WorkerResult<NewTx> 
     let mut tx = TxBuilder::new();
 
     let from_address = Address::from_bech32(&req.from_address).map_err(|_| BuildError::MalformedAddress)?;
-    let to_address = Address::from_bech32(&req.to_address).map_err(|_| BuildError::MalformedAddress)?;
 
     let address_source = UtxoSource::Search(UtxoPattern {
         address: Some(AddressPattern {
@@ -75,7 +74,7 @@ fn send_ada(_: Config<()>, req: Params<TransferRequest>) -> WorkerResult<NewTx> 
         .with_input(CoinSelectionInput(address_source.clone(), req.amount))
         .with_output(
             OutputBuilder::new()
-                .address(to_address)
+                .address(req.to_address.clone())
                 .with_value(req.amount),
         )
         .with_output(FeeChangeReturn(address_source));
