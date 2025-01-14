@@ -6,3 +6,4 @@ repository = "https://github.com/blockfrost/firefly-cardano"
 
 [dependencies]
 balius-sdk = { git = "https://github.com/txpipe/balius.git", rev = "a72601f" }
+serde = { version = "1", features = ["derive"] }
